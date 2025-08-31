@@ -140,7 +140,7 @@ class AdvertisementView(MethodView):
         adv = Advertisement(
             name=json_data["name"],
             description=json_data["description"],
-            owner = current_user.id
+            owner = current_user
         )
         add_adv(adv)
         return jsonify(adv.id_json)
@@ -151,7 +151,7 @@ class AdvertisementView(MethodView):
             raise HttpError(403, message="You must be logged in to edit an advertisement.")
 
         adv = get_adv_by_id(advertisement_id)
-        if adv.owner != current_user.email:
+        if adv.owner != current_user:
             raise HttpError(403, message="You do not have permission to edit this advertisement.")
 
         json_data = validate(UpdateAdvRequest, request.json)
@@ -161,7 +161,7 @@ class AdvertisementView(MethodView):
         if "description" in json_data:
             adv.description = json_data["description"]
         if "owner" in json_data:
-            adv.owner = json_data["owner"]
+            adv.owner = current_user
 
         add_adv(adv)
         return jsonify(adv.id_json)
@@ -172,7 +172,7 @@ class AdvertisementView(MethodView):
             raise HttpError(403, message="You must be logged in to delete an advertisement.")
 
         adv = get_adv_by_id(advertisement_id)
-        if adv.owner != current_user.email:
+        if adv.owner != current_user:
             raise HttpError(403, message="You do not have permission to delete this advertisement.")
 
         request.session.delete(adv)

@@ -5,7 +5,7 @@ from errors import HttpError
 class BaseAdvRequest(BaseModel):
     name: str
     description: str
-    owner: str
+    owner: int
 
 
 class RegisterRequest(BaseModel):
@@ -32,7 +32,7 @@ class CreateAdvRequest(BaseAdvRequest):
 class UpdateAdvRequest(BaseAdvRequest):
     name: str | None = None
     description: str | None = None
-    owner: str | None = None
+    owner: int | None = None
 
 
 def validate(

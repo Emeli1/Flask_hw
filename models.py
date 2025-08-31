@@ -1,10 +1,10 @@
 import atexit
 import os
 import datetime
+from typing import List
 
-from sqlalchemy import create_engine, Integer, String, func, DateTime
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, mapped_column, Mapped
-
+from sqlalchemy import create_engine, Integer, String, func, DateTime, ForeignKey
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, mapped_column, Mapped, relationship
 
 POSTGRES_USER = os.getenv("POSTGRES_USER", "user")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "1234")
@@ -31,6 +31,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    advertisements: Mapped[List["Advertisement"]] = relationship(back_populates="owner")
 
     @property
     def id_json(self):
@@ -54,7 +55,10 @@ class Advertisement(Base):
         DateTime,
         server_default=func.now(),
     )
-    owner: Mapped[str] = mapped_column(String)
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+
+    owner: Mapped["User"] = relationship(back_populates='advertisements')
+
 
     @property
     def id_json(self):
